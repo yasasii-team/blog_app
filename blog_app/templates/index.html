@@ -1,22 +1,5 @@
-<!DOCTYPE html>
-<html lang="ja" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>やさしい共同ブログ</title>
-    <link rel="stylesheet" href="../static/css/style.css">
-  </head>
-  <body>
-    <header class="header-container">
-      <div class="header-logo-nav-wrap">
-        <h1 class="header-logo"><a href="#">やさしい共同ブログ</a></h1>
-          <nav class="header-nav">
-            <ul>
-              <li><a href="#">新規登録</a></li>
-              <li><a href="#">ログイン</a></li>
-            </ul>
-          </nav>
-      </div>
-    </header>
+{% extends 'layout.html' %}
+{% block body %}
     <section class="section">
       <h1>ブログ一覧</h1>
       <table>
@@ -34,8 +17,4 @@
         </tr>
       </table>
     </section>
-    <footer class="footer">
-      <p>やさしい会Pythonチーム All Rights Reserved.</p>
-    </footer>
-  </body>
-</html>
+{% endblock %}
