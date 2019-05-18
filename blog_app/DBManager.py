@@ -16,12 +16,12 @@ class DBManager():
         self.cursor.close()
         self.db.close()
 
-    def find(self, id: int):
+    def get_post(self, id: int):
         sql = "select * from posts where id=?;"
         self.cursor.execute(sql, (id,))
         return self.cursor.fetchall()[0]
 
-    def create(self, user_id: int, title: str, body: str):
+    def create_post(self, user_id: int, title: str, body: str):
         result = True
         try:
             sql = "insert into posts(user_id, title, body, created_at, updated_at) values(?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'));"
