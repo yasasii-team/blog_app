@@ -6,8 +6,8 @@
 {% endif %}
 <form action="{{ url_for('create_page') }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-    <p><label for="title">タイトル：</label><input type="text" name="title" value="{{ title }}"></p>
-    <p><label for="body">本文：</label><textarea name="body" rows="4" cols="40">{{ body }}</textarea></p>
+    <p><label for="title">タイトル：</label><input type="text" name="title" value="{{ data['title'] }}"></p>
+    <p><label for="body">本文：</label><textarea name="body" rows="4" cols="40">{{ data['body'] }}</textarea></p>
     <p><input type="submit" value="送信"></p>
 </form>
 {% endblock %}
