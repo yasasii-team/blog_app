@@ -5,8 +5,9 @@
       <ul>
         <!-- views.index():で、posts = DBMnager.get_all_posts()して、forで展開 -->
         {% for post in posts %}
+        <li><a href="/post_detail/{{post[0]}}">{{ post[1] }}</a></li>
         <!-- views.pyのpost_detailメソッドにpost.idを渡し、レンダリングする -->
-        <li><a href="/post_detail/{{ post.id }}">{{ post.title }}</a></li>
+        <!-- <li><a href="/post_detail/{{ post.id }}">{{ post.title }}</a></li> -->
         {% endfor %}
 
       </ul>
