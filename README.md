@@ -18,13 +18,6 @@ Flask 1.0.2
 ```
 $ pip install -r requirements.txt
 ```
-
-anacondaを入れている場合は以下のコマンドに書き換えてください
-
-```
-$ conda install -r requirements.txt
-```
-
 # setting
 
 DBの初期化などを行います
