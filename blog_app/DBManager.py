@@ -15,3 +15,19 @@ class DBManager():
     def close(self):
         self.cursor.close()
         self.db.close()
+
+    def get_post(self, id: int):
+        sql = "select * from posts where id=?;"
+        self.cursor.execute(sql, (id,))
+        return self.cursor.fetchall()[0]
+
+    def create_post(self, user_id: int, title: str, body: str):
+        result = True
+        try:
+            sql = "insert into posts(user_id, title, body, created_at, updated_at) values(?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'));"
+            self.db.execute(sql, [user_id, title, body])
+            self.db.commit()
+        except:
+            self.db.rollback()
+            result = False
+        return result
