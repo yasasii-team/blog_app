@@ -37,3 +37,25 @@ class DBManager():
             self.db.rollback()
             result = False
         return result
+
+    def update_post(self, id: int ,title: str, body: str):
+        result = True
+        try:
+            sql = "update posts set title = ?, body = ?, updated_at = datetime('now', 'localtime') where id = ?;"
+            self.db.execute(sql, [title, body, id])
+            self.db.commit()
+        except:
+            self.db.rollback()
+            result = False
+        return result
+
+    def delete_post(self, id: int):
+        result = True
+        try:
+            sql = "delete from posts where id = ?;"
+            self.db.execute(sql, (id,))
+            self.db.commit()
+        except:
+            self.db.rollback()
+            result = False
+        return result
