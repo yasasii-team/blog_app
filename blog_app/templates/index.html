@@ -4,22 +4,8 @@
       <h1>ブログ一覧</h1>
       <ul>
         {% for post in posts %}
-        <li><a href="/post_detail/" + {{ post.id }}>{{ post.title }}</a></li>
+        <li><a href="/post_detail/{{ post.id }}">{{ post.title }}</a></li>
         {% endfor %}
       </ul>
-      <!-- <table>
-        <tr>
-          <td>タイトル１</td>
-        </tr>
-        <tr>
-          <td>タイトル２</td>
-        </tr>
-        <tr>
-          <td>タイトル３</td>
-        </tr>
-        <tr>
-          <td>タイトル４</td>
-        </tr>
-      </table> -->
     </section>
 {% endblock %}

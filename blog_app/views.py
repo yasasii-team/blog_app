@@ -9,10 +9,10 @@ def index():
     posts = DBManager().get_all_posts()
     return render_template('index.html',posts = posts)
 
-@app.route('/post_detail/<post_id>')
+@app.route('/post_detail/<int:post_id>')
 def post_detail(post_id):
     post = DBManager().get_post(post_id)
-    return render_template('/post_detail',post = post)
+    return render_template('post_detail.html',post = post)
 
 
 # @app.route('/')
