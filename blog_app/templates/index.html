@@ -4,7 +4,10 @@
       <h1>ブログ一覧</h1>
       <ul>
         {% for post in posts %}
-        <li><a href="/post_detail/{{ post.id }}">{{ post.title }}</a></li>
+        <li id="deleted_post_{{ post.id }}">
+          <a href="/post_detail/{{ post.id }}">{{ post.title }}</a>
+          <a href="#" id="{{ post.id }}">[X]</a>
+        </li>
         {% endfor %}
       </ul>
     </section>
