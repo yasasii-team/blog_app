@@ -10,6 +10,8 @@ from flask_wtf.csrf import CSRFProtect
 #from flask_wtf import FlaskForm
 #from wtforms import StringField, SubmitField
 #from wtforms.validators import Required
+from flask import Flask, render_template
+from blog_app.DBManager import DBManager
 
 app.config['SECRET_KEY'] = os.urandom(24)
 csrf = CSRFProtect(app)
@@ -126,3 +128,7 @@ def update_page(post_id):
     except KeyError as e:
         print(e)
         return redirect(url_for('index'))
+
+# @app.route('/')
+# def index():
+#     return "Hello World"
