@@ -1,5 +1,5 @@
 $(function(){
-    $('a').on('click', function(){
+    $('.delete_button').on('click', function(){
         var id = $(this).attr("id");
         var csrf_token = $('meta[name="csrf_token"]').attr('content');
         var send_data  = {
