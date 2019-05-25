@@ -19,9 +19,11 @@ def delete():
     id = request.json['id']
     db_manager = DBManager()
     if db_manager.delete_post(id):
+        db_manager.close()
         result = {'id': id}
         return jsonify(result), 201
     else:
+        db_manager.close()
         return abort(403)
 
 # @app.route('/')
