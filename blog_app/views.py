@@ -1,8 +1,8 @@
 # coding: utf-8
 import os
 from blog_app import app
-from blog_app.DBManager import DBManager
-from flask import Flask, render_template, request, url_for, redirect, session
+from flask import Flask, render_template, jsonify, abort, request, url_for, redirect, session
+from blog_app.DBManager import DBManager 
 from flask_wtf.csrf import CSRFProtect
 
 app.config['SECRET_KEY'] = os.urandom(24)
@@ -101,6 +101,17 @@ def update_page(post_id):
         session['title'] = post['title']
         session['body'] = post['body']
         return render_template('update.html')
+@app.route('/delete', methods=['POST'])
+def delete():
+    id = request.json['id']
+    db_manager = DBManager()
+    if db_manager.delete_post(id):
+        db_manager.close()
+        result = {'id': id}
+        return jsonify(result), 201
+    else:
+        db_manager.close()
+        return abort(403)
 
 # @app.route('/')
 # def index():
