@@ -1,6 +1,6 @@
 # coding: utf-8
 from blog_app import app
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, abort,request
 from blog_app.DBManager import DBManager
 
 
@@ -14,6 +14,17 @@ def post_detail(post_id):
     post = DBManager().get_post(post_id)
     return render_template('post_detail.html',post = post)
 
+@app.route('/delete', methods=['POST'])
+def delete():
+    id = request.json['id']
+    db_manager = DBManager()
+    if db_manager.delete_post(id):
+        db_manager.close()
+        result = {'id': id}
+        return jsonify(result), 201
+    else:
+        db_manager.close()
+        return abort(403)
 
 # @app.route('/')
 # def index():
