@@ -1,13 +1,7 @@
 # coding: utf-8
-import os
 from blog_app import app
-from flask import Flask, render_template, jsonify, abort, request, url_for, redirect, session
+from flask import render_template, jsonify, abort, request, url_for, redirect, session
 from blog_app.DBManager import DBManager 
-from flask_wtf.csrf import CSRFProtect
-
-app.config['SECRET_KEY'] = os.urandom(24)
-app.secret_key = app.config['SECRET_KEY'] 
-csrf = CSRFProtect(app)
 
 @app.route('/')
 def index():
