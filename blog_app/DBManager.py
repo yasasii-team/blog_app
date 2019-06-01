@@ -59,3 +59,23 @@ class DBManager():
             self.db.rollback()
             result = False
         return result
+
+    def get_user(self, name: int):
+        sql = "select * from users where name=?;"
+        self.cursor.execute(sql, (name,))
+        users = self.cursor.fetchall()
+        if users:
+            return users[0]
+        else:
+            return None
+
+    def create_user(self, name: str, email: str, password: str):
+        result = True
+        try:
+            sql = "insert into users(name, email, password, created_at, updated_at) values(?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'));"
+            self.db.execute(sql, [name, email, password])
+            self.db.commit()
+        except:
+            self.db.rollback()
+            result = False
+        return result
