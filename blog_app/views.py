@@ -21,17 +21,20 @@ def create_page():
 
     #POST:登録処理
     if request.method == 'POST':
-        session['title'] = request.form['title']
-        session['body'] = request.form['body']
+        title = request.form['title']
+        body = request.form['body']
 
-        if not session['title'] or not session['body']:
+        session['title'] = title
+        session['body'] = body
+
+        if not title or not body:
             session['alert'] = 'タイトルと本文は必須入力です'
             return render_template('add.html') 
         else:
             blog_db = DBManager()
-            result = blog_db.create_post(user_id, session['title'], session['body'] )
+            result = blog_db.create_post(user_id, title, body)
             blog_db.close()
-
+            
             if result:
                 return redirect(url_for('index'))           
             else:
@@ -45,20 +48,19 @@ def create_page():
         session.pop('body', None)
         return render_template('add.html') 
 
-
-def check_and_get_post(id):
+def check_and_get_post(id,blog_db):
     # 該当する投稿があるかのチェック
     if not id:
         # /update/にアクセスしたときにトップに返るようにするつもりだがうまく動いていないので要修正
         session['alert'] = "不正なアクセスです" 
         return redirect(url_for('index'))
 
-    blog_DB = DBManager()
-    post = blog_DB.get_post(id)
+    post = blog_db.get_post(id)
 
     if not post:
         # 該当する投稿がなかった時にトップに返るようにするつもりだがうまく動いていないので要修正
         session['alert'] = "該当する投稿がありません" 
+        blog_db.close()
         return redirect(url_for('index'))
     return post
 
@@ -66,35 +68,40 @@ def check_and_get_post(id):
 def update_page(post_id):
     #POST:更新処理
     if request.method == 'POST':
+        post_id = request.form['post_id']
+        title = request.form['title']
+        body = request.form['body']
 
-        post = check_and_get_post(request.form['post_id'])
-        session['post_id'] = request.form['post_id']
-        session['title'] = request.form['title']
-        session['body'] = request.form['body']
+        session['post_id'] = post_id
+        session['title'] = title
+        session['body'] = body
 
-        if not session['title'] or not session['body']:
+        if not title or not body:
             session['alert'] = 'タイトルと本文は必須入力です'
             return render_template('update.html') 
-
         else:
             blog_db = DBManager()
-            result = blog_db.update_post(session['post_id'] ,session['title'], session['body'])
+            post = check_and_get_post(post_id, blog_db)
+            result = blog_db.update_post(post_id ,title, body)
             blog_db.close()
 
             if result:
-                return redirect(url_for('post_detail', post_id=session['post_id'] ))   
+                return redirect(url_for('post_detail', post_id=post_id))   
             else:
                 session['alert'] = 'データベース登録に失敗しました'
                 return render_template('update.html')
 
     #GET：入力
     else:
-        post = check_and_get_post(post_id)
+        blog_db = DBManager()
+        post = check_and_get_post(post_id, blog_db)
         session.pop('alert', None)
         session['post_id'] = post_id
         session['title'] = post['title']
         session['body'] = post['body']
+        blog_db.close()
         return render_template('update.html')
+
 @app.route('/delete', methods=['POST'])
 def delete():
     id = request.json['id']
