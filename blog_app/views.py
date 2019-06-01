@@ -53,6 +53,7 @@ def check_and_get_post(id,blog_db):
     if not id:
         # /update/にアクセスしたときにトップに返るようにするつもりだがうまく動いていないので要修正
         session['alert'] = "不正なアクセスです" 
+        blog_db.close()
         return redirect(url_for('index'))
 
     post = blog_db.get_post(id)
