@@ -60,7 +60,7 @@ class DBManager():
             result = False
         return result
 
-    def get_user(self, name: int):
+    def get_user(self, name: str):
         sql = "select * from users where name=?;"
         self.cursor.execute(sql, (name,))
         users = self.cursor.fetchall()
