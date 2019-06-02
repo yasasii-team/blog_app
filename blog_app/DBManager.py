@@ -59,3 +59,24 @@ class DBManager():
             self.db.rollback()
             result = False
         return result
+
+    def get_user_by_id(self, id: int):
+        sql = "select * from users where id=?;"
+        self.cursor.execute(sql, (id,))
+        users = self.cursor.fetchall()
+        if users:
+            return users[0]
+        else:
+            return None
+
+    def update_user(self, id: int, email: str, password: str):
+        result = True
+        try:
+            sql = "update users set email = ?, password = ?, updated_at = datetime('now', 'localtime') where id = ?;"
+            self.db.execute(sql, [email, password, id])
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            print(e)
+            result = False
+        return result
