@@ -53,7 +53,9 @@ a {
 }
 
 .section > ul > hr {
-  margin: 20px;
+  margin-top: 10px;
+  margin-bottom: 30px;
+  margin-left: 0;
 }
 
 .footer {
