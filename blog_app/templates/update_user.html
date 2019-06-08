@@ -6,7 +6,7 @@
 {% endif %}
 <form action="{{ url_for('update_user') }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-    <p><label for="title">name：</label><input type="text" name="name" value="{{ session.name }}"></p>
+    <p><label for="title">ユーザー名：</label><input type="text" name="username" value="{{ session.username }}"></p>
     <p><label for="title">e-mail：</label><input type="text" name="email" value="{{ session.email }}"></p>
     <p><input type="submit" value="送信"></p>
 </form>

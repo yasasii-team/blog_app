@@ -119,14 +119,14 @@ def delete():
 def name_validation(name):
     #英数字3-256文字
     pattern = r"^[A-Za-z0-9]{3,256}$"
-    if re.match(pattern , name):
+    if re.match(pattern, name):
         return True
     else:
         return False
 
 def mail_validation(mail):
     pattern = r"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"
-    if re.match(pattern , mail):
+    if re.match(pattern, mail):
         return True
     else:
         return False
@@ -146,35 +146,35 @@ def update_user():
    
     #POST:ユーザー更新処理
     if request.method == 'POST':
-        name = request.form['name']
+        username = request.form['username']
         email = request.form['email']
-        session['name'] = name
+        session['username'] = username
         session['email'] = email
 
-        if not name or not email:
-            session['alert'] = 'nameとe-mailは必須入力です'
+        if not username or not email:
+            session['alert'] = 'ユーザー名とe-mailは必須入力です'
             blog_db.close()
             return render_template('update_user.html')           
         else:
             #バリデーションチェック
-            if not name_validation(name):
-                session['alert'] = 'nameの書式が誤っています'
+            if not name_validation(username):
+                session['alert'] = 'ユーザー名の書式が誤っています'
                 blog_db.close()
                 return render_template('update_user.html')
             if not mail_validation(email):
-                session['alert'] = 'emailの書式が誤っています'
+                session['alert'] = 'e-mailの書式が誤っています'
                 blog_db.close()
                 return render_template('update_user.html')
 
             #ユーザーID重複チェック(ユーザー登録機能がマージされてからテスト)
-            user_tmp = blog_db.get_user(name)
+            user_tmp = blog_db.get_user(username)
             if user_tmp:
                 if user_tmp['id'] != user_id:
-                    session['alert'] = 'すでにnameは使われています'
+                    session['alert'] = 'すでにユーザー名は使われています'
                     blog_db.close()
                     return render_template('update_user.html')
 
-            result = blog_db.update_user(user_id, name, email)
+            result = blog_db.update_user(user_id, username, email)
             blog_db.close()
             
             if result:
@@ -186,7 +186,7 @@ def update_user():
     #ユーザー更新画面へ
     else:
         session.pop('alert', None)
-        session['name'] = login_user['name']
+        session['username'] = login_user['name']
         session['email'] = login_user['email']
         blog_db.close()
         return render_template('update_user.html')
