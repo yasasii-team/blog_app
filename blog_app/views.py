@@ -2,6 +2,7 @@
 from blog_app import app
 from flask import render_template, jsonify, abort, request, url_for, redirect, session
 from blog_app.DBManager import DBManager
+import re
 
 @app.route('/')
 def index():
@@ -115,22 +116,60 @@ def delete():
         db_manager.close()
         return abort(403)
 
+def name_validation(name):
+    #英数字3-256文字
+    pattern = r"^[A-Za-z0-9]{3,256}$"
+    if re.match(pattern, name):
+        return True
+    else:
+        return False
+
+def mail_validation(mail):
+    pattern = r"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"
+    if re.match(pattern, mail):
+        return True
+    else:
+        return False
+
+def password_validation(password):
+    #数字小文字大文字を含む8-256文字
+    pattern = r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,256}$"
+    if re.match(pattern, password):
+        return True
+    else:
+        return False
+
 @app.route('/sign_up', methods=['GET', 'POST'])
 def create_user():
     #POST:ユーザー登録処理
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
-        password = request.form['password']
+        password1 = request.form['password1']
+        password2 = request.form['password2']
 
+        #パスワードはセッションに入れない
         session['username'] = username
         session['email'] = email
-        session['password'] = password
 
-        if not username or not email or not password:
-            session['alert'] = 'ユーザー名とe-mailとパスワードは必須入力です'
+        if not username or not email or not password1 or not password1:
+            session['alert'] = 'ユーザー名とe-mailとパスワードとパスワード（確認）は必須入力です'
             return render_template('sign_up.html') 
+        elif password1 != password2:
+            session['alert'] = 'パスワードとパスワード（確認）は同じ文字を入れてください'
+            return render_template('sign_up.html')            
         else:
+            #バリデーションチェック
+            if not name_validation(username):
+                session['alert'] = 'ユーザー名の書式が誤っています'
+                return render_template('sign_up.html')
+            if not mail_validation(email):
+                session['alert'] = 'e-mailの書式が誤っています'
+                return render_template('sign_up.html')
+            if not password_validation(password1):
+                session['alert'] = 'パスワードの書式が誤っています'
+                return render_template('sign_up.html')
+
             blog_db = DBManager()
 
             #ユーザーID重複チェック
@@ -138,7 +177,7 @@ def create_user():
                 session['alert'] = 'ユーザー名は既に存在しています'
                 blog_db.close()
                 return render_template('sign_up.html') 
-            result = blog_db.create_user(username, email, password)
+            result = blog_db.create_user(username, email, password1)
             blog_db.close()
             
             if result:
@@ -152,7 +191,8 @@ def create_user():
         session.pop('alert', None)
         session.pop('username', None)
         session.pop('email', None)
-        session.pop('password', None)
+        session.pop('password1', None)
+        session.pop('password2', None)
         return render_template('sign_up.html')
 
 # @app.route('/')
