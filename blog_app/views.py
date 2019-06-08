@@ -2,6 +2,7 @@
 from blog_app import app
 from flask import render_template, jsonify, abort, request, url_for, redirect, session
 from blog_app.DBManager import DBManager
+import re
 
 @app.route('/')
 def index():
@@ -115,6 +116,21 @@ def delete():
         db_manager.close()
         return abort(403)
 
+def name_validation(name):
+    #英数字3-256文字
+    pattern = r"^[A-Za-z0-9]{3,256}$"
+    if re.match(pattern , name):
+        return True
+    else:
+        return False
+
+def mail_validation(mail):
+    pattern = r"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"
+    if re.match(pattern , mail):
+        return True
+    else:
+        return False
+    
 @app.route('/update_user', methods=['GET', 'POST'])
 def update_user():
     #ログイン機能に合わせて要書き換え
@@ -140,6 +156,16 @@ def update_user():
             blog_db.close()
             return render_template('update_user.html')           
         else:
+            #バリデーションチェック
+            if not name_validation(name):
+                session['alert'] = 'nameの書式が誤っています'
+                blog_db.close()
+                return render_template('update_user.html')
+            if not mail_validation(email):
+                session['alert'] = 'emailの書式が誤っています'
+                blog_db.close()
+                return render_template('update_user.html')
+
             #ユーザーID重複チェック(ユーザー登録機能がマージされてからテスト)
             user_tmp = blog_db.get_user(name)
             if user_tmp:
