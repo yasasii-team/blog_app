@@ -125,23 +125,30 @@ def update_user():
     login_user = blog_db.get_user_by_id(user_id)
     if not login_user:
         session['alert'] = '不正なアクセスです'
-        return redirect(url_for('index'))        
-
+        blog_db.close()
+        return redirect(url_for('index')) 
+   
     #POST:ユーザー更新処理
     if request.method == 'POST':
+        name = request.form['name']
         email = request.form['email']
-        password_1 = request.form['password_1']
-        password_2 = request.form['password_2']
+        session['name'] = name
         session['email'] = email
 
-        if not email or not password_1 or not password_2:
-            session['alert'] = 'e-mailとパスワードは必須入力です'
-            return render_template('update_user.html') 
-        elif password_1 != password_2:
-            session['alert'] = 'パスワードが異なります'
-            return render_template('update_user.html')             
+        if not name or not email:
+            session['alert'] = 'nameとe-mailは必須入力です'
+            blog_db.close()
+            return render_template('update_user.html')           
         else:
-            result = blog_db.update_user(user_id, email, password_1)
+            #ユーザーID重複チェック(ユーザー登録機能がマージされてからテスト)
+            user_tmp = blog_db.get_user(name)
+            if user_tmp:
+                if user_tmp['id'] != user_id:
+                    session['alert'] = 'すでにnameは使われています'
+                    blog_db.close()
+                    return render_template('update_user.html')
+
+            result = blog_db.update_user(user_id, name, email)
             blog_db.close()
             
             if result:
@@ -153,7 +160,9 @@ def update_user():
     #ユーザー更新画面へ
     else:
         session.pop('alert', None)
+        session['name'] = login_user['name']
         session['email'] = login_user['email']
+        blog_db.close()
         return render_template('update_user.html')
 
 # @app.route('/')

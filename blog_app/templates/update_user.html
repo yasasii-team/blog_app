@@ -6,9 +6,8 @@
 {% endif %}
 <form action="{{ url_for('update_user') }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <p><label for="title">name：</label><input type="text" name="name" value="{{ session.name }}"></p>
     <p><label for="title">e-mail：</label><input type="text" name="email" value="{{ session.email }}"></p>
-    <p><label for="title">パスワード1：</label><input type="password" name="password_1"></p>
-    <p><label for="title">パスワード2（確認）：</label><input type="password" name="password_2"></p>
     <p><input type="submit" value="送信"></p>
 </form>
 {% endblock %}
