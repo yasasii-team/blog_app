@@ -15,9 +15,14 @@
         <h1 class="header-logo"><a href="#">やさしい共同ブログ</a></h1>
           <nav class="header-nav">
             <ul>
+            {% if not session.user_id %}
               <li><a href="#">SignUp</a></li>
-              <li><a href="#">SignIn</a></li>
-            </ul>
+              <li><a href="/signin">SignIn</a></li>
+            {% else %}
+              <li><a href="#">CreatePost</a></li>
+              <li><a href="/signout">SignOut</a></li>
+            {% endif %}
+          </ul>
           </nav>
       </div>
     </header>

@@ -6,7 +6,9 @@
         {% for post in posts %}
         <li id="deleted_post_{{ post.id }}">
           <a href="/post_detail/{{ post.id }}">{{ post.title }}</a>
+          {% if session.user_id %}
           <a href="#" id="{{ post.id }}" class="delete_button">[X]</a>
+          {% endif %}
         </li>
         {% endfor %}
       </ul>

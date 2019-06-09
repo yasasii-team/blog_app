@@ -1,7 +1,9 @@
 # coding: utf-8
 from blog_app import app
 from flask import render_template, jsonify, abort, request, url_for, redirect, session
-from blog_app.DBManager import DBManager 
+from blog_app.DBManager import DBManager
+from flask_wtf.csrf import CSRFProtect
+csrf = CSRFProtect(app)
 
 @app.route('/')
 def index():
@@ -12,6 +14,36 @@ def index():
 def post_detail(post_id):
     post = DBManager().get_post(post_id)
     return render_template('post_detail.html',post = post)
+
+@app.route('/signin', methods=['GET','POST'])
+def signin():
+
+    #user1のメールアドレスとパスワードをデータベースより取得
+    sql = 'select email, password from users;'
+    db = DBManager()
+    db.cursor.execute(sql)
+    signin_info = db.cursor.fetchall()
+    email = signin_info[0][0]
+    password = signin_info[0][1]
+    db.close()
+
+    session.pop('emailalert', None)
+    session.pop('passwordalert', None)
+
+    if request.method == 'POST':
+        if request.form['email'] != email:
+            session['emailalert'] = 'メールアドレスが間違っています'
+        elif request.form['password'] != password:
+            session['passwordalert'] = 'パスワードが間違っています'
+        else:
+            session['user_id'] = 1
+            return redirect(url_for('index'))
+    return render_template('signin.html')
+
+@app.route('/signout')
+def signout():
+    session.pop('user_id', None)
+    return redirect(url_for('index'))
 
 @app.route('/add', methods=['GET', 'POST'])
 def create_page():
@@ -29,30 +61,30 @@ def create_page():
 
         if not title or not body:
             session['alert'] = 'タイトルと本文は必須入力です'
-            return render_template('add.html') 
+            return render_template('add.html')
         else:
             blog_db = DBManager()
             result = blog_db.create_post(user_id, title, body)
             blog_db.close()
-            
+
             if result:
-                return redirect(url_for('index'))           
+                return redirect(url_for('index'))
             else:
                 session['alert'] = 'データベース登録に失敗しました'
-                return render_template('add.html') 
+                return render_template('add.html')
 
     #登録画面へ
     else:
         session.pop('alert', None)
         session.pop('title', None)
         session.pop('body', None)
-        return render_template('add.html') 
+        return render_template('add.html')
 
 def check_and_get_post(id,blog_db):
     # 該当する投稿があるかのチェック
     if not id:
         # /update/にアクセスしたときにトップに返るようにするつもりだがうまく動いていないので要修正
-        session['alert'] = "不正なアクセスです" 
+        session['alert'] = "不正なアクセスです"
         blog_db.close()
         return redirect(url_for('index'))
 
@@ -60,7 +92,7 @@ def check_and_get_post(id,blog_db):
 
     if not post:
         # 該当する投稿がなかった時にトップに返るようにするつもりだがうまく動いていないので要修正
-        session['alert'] = "該当する投稿がありません" 
+        session['alert'] = "該当する投稿がありません"
         blog_db.close()
         return redirect(url_for('index'))
     return post
@@ -79,7 +111,7 @@ def update_page(post_id):
 
         if not title or not body:
             session['alert'] = 'タイトルと本文は必須入力です'
-            return render_template('update.html') 
+            return render_template('update.html')
         else:
             blog_db = DBManager()
             post = check_and_get_post(post_id, blog_db)
@@ -87,7 +119,7 @@ def update_page(post_id):
             blog_db.close()
 
             if result:
-                return redirect(url_for('post_detail', post_id=post_id))   
+                return redirect(url_for('post_detail', post_id=post_id))
             else:
                 session['alert'] = 'データベース登録に失敗しました'
                 return render_template('update.html')
