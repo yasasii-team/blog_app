@@ -60,9 +60,9 @@ class DBManager():
             result = False
         return result
 
-    def get_user(self, name: str):
-        sql = "select * from users where name=?;"
-        self.cursor.execute(sql, (name,))
+    def get_user_by_mail(self, email: str):
+        sql = "select * from users where email=?;"
+        self.cursor.execute(sql, (email,))
         users = self.cursor.fetchall()
         if users:
             return users[0]

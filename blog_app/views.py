@@ -117,8 +117,9 @@ def delete():
         return abort(403)
 
 def name_validation(name):
-    #英数字3-256文字
-    pattern = r"^[A-Za-z0-9]{3,256}$"
+    #英数字3-255文字
+    #ログインにメールアドレスのほうを使うなら文字数制限だけでよいかも
+    pattern = r"^[A-Za-z0-9]{3,255}$"
     if re.match(pattern, name):
         return True
     else:
@@ -166,11 +167,11 @@ def update_user():
                 blog_db.close()
                 return render_template('update_user.html')
 
-            #ユーザーID重複チェック(ユーザー登録機能がマージされてからテスト)
-            user_tmp = blog_db.get_user(username)
+            #メールアドレス重複チェック(ログイン機能とユーザー登録機能がマージされてからテスト)
+            user_tmp = blog_db.get_user_by_mail(email)
             if user_tmp:
                 if user_tmp['id'] != user_id:
-                    session['alert'] = 'すでにユーザー名は使われています'
+                    session['alert'] = 'e-mailは既に存在しています'
                     blog_db.close()
                     return render_template('update_user.html')
 
