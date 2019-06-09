@@ -117,8 +117,9 @@ def delete():
         return abort(403)
 
 def name_validation(name):
-    #英数字3-256文字
-    pattern = r"^[A-Za-z0-9]{3,256}$"
+    #英数字3-255文字
+    #ログインにメールアドレスのほうを使うなら文字数制限だけでよいかも
+    pattern = r"^[A-Za-z0-9]{3,255}$"
     if re.match(pattern, name):
         return True
     else:
@@ -132,8 +133,8 @@ def mail_validation(mail):
         return False
 
 def password_validation(password):
-    #数字小文字大文字を含む8-256文字
-    pattern = r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,256}$"
+    #数字小文字大文字を含む8-255文字
+    pattern = r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,255}$"
     if re.match(pattern, password):
         return True
     else:
@@ -172,9 +173,9 @@ def create_user():
 
             blog_db = DBManager()
 
-            #ユーザーID重複チェック
-            if blog_db.get_user(username):
-                session['alert'] = 'ユーザー名は既に存在しています'
+            #メールアドレス重複チェック
+            if blog_db.get_user_by_mail(email):
+                session['alert'] = 'e-mailは既に存在しています'
                 blog_db.close()
                 return render_template('sign_up.html') 
             result = blog_db.create_user(username, email, password1)
