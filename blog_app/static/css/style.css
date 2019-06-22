@@ -48,6 +48,16 @@ a {
   margin: 50px 80px;
 }
 
+.section > ul {
+  list-style: none;
+}
+
+.section > ul > hr {
+  margin-top: 10px;
+  margin-bottom: 30px;
+  margin-left: 0;
+}
+
 .footer {
   background-color: #a4c1f4;
   text-align: center;
