@@ -5,12 +5,16 @@ from blog_app.DBManager import DBManager
 
 @app.route('/')
 def index():
-    posts = DBManager().get_all_posts()
+    db = DBManager()
+    posts = db.get_all_posts()
+    db.close()
     return render_template('index.html',posts = posts)
 
 @app.route('/post_detail/<int:post_id>')
 def post_detail(post_id):
-    post = DBManager().get_post(post_id)
+    db = DBManager()
+    post = db.get_post(post_id)
+    db.close()
     return render_template('post_detail.html',post = post)
 
 @app.route('/add', methods=['GET', 'POST'])
