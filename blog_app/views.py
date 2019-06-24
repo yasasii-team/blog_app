@@ -117,9 +117,9 @@ def delete():
         return abort(403)
 
 def name_validation(name):
-    #英数字3-255文字
+    #英数字3-50文字
     #ログインにメールアドレスのほうを使うなら文字数制限だけでよいかも
-    pattern = r"^[A-Za-z0-9]{3,255}$"
+    pattern = r"^[A-Za-z0-9]{3,50}$"
     if re.match(pattern, name):
         return True
     else:
