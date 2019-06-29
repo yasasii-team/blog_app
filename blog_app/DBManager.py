@@ -59,3 +59,54 @@ class DBManager():
             self.db.rollback()
             result = False
         return result
+
+    def find_user(self, email: str, password: str):
+        sql = "select * from users where email=? and password=?;"
+        self.cursor.execute(sql, (email, password,))
+        return self.cursor.fetchone()
+
+    def create_user(self, name: str, email: str, password: str):
+        result = True
+        try:
+            sql = "insert into users(name, email, password, created_at, updated_at) values (?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'));"
+            # ここでパスワードの暗号化処理を入れる
+            self.db.execute(sql, (name, email, password,))
+            self.db.commit()
+        except:
+            self.db.rollback()
+            result = False
+        return result
+
+    def update_user(self, user_id: int, name: str, email: str):
+        result = True
+        try:
+            sql = "update users set name = ?, email = ?, updated_at = datetime('now', 'localtime') where id = ?;"
+            self.db.execute(sql, (name, email, user_id, ))
+            self.db.commit()
+        except:
+            self.db.rollback()
+            result = False
+        return result
+    
+    def change_password(self, user_id: int, password: str):
+        result = True
+        try:
+            sql = "update users set password = ?, updated_at = datetime('now', 'localtime') where id = ?;"
+            # ここに暗号化処理を追加
+            self.db.execute(sql, (password, user_id,))
+            self.db.commit()
+        except:
+            self.db.rollback()
+            result = False
+        return result
+
+    def delete_user(self, user_id: int):
+        result = True
+        try:
+            sql = "delete from users where id=?"
+            self.db.execute(sql, (user_id,))
+            self.db.commit()
+        except:
+            self.db.rollback()
+            result = False
+        return result
