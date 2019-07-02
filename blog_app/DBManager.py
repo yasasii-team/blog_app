@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from blog_app import app
 import sqlite3
+from werkzeug.security import check_password_hash, generate_password_hash
 
 class DBManager():
     def __init__(self):
@@ -61,15 +62,19 @@ class DBManager():
         return result
 
     def find_user(self, email: str, password: str):
-        sql = "select * from users where email=? and password=?;"
-        self.cursor.execute(sql, (email, password,))
-        return self.cursor.fetchone()
+        sql = "select * from users where email=?;"
+        self.cursor.execute(sql, (email,))
+        user = self.cursor.fetchone()
+        if check_password_hash(user.password, password):
+            return user
+        else:
+            return None
 
     def create_user(self, name: str, email: str, password: str):
         result = True
         try:
+            password = generate_password_hash(password)
             sql = "insert into users(name, email, password, created_at, updated_at) values (?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'));"
-            # ここでパスワードの暗号化処理を入れる
             self.db.execute(sql, (name, email, password,))
             self.db.commit()
         except:
@@ -91,6 +96,7 @@ class DBManager():
     def change_password(self, user_id: int, password: str):
         result = True
         try:
+            password = generate_password_hash(password)
             sql = "update users set password = ?, updated_at = datetime('now', 'localtime') where id = ?;"
             # ここに暗号化処理を追加
             self.db.execute(sql, (password, user_id,))
