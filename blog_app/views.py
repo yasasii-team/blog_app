@@ -157,7 +157,7 @@ def create_user():
         session['username'] = username
         session['email'] = email
 
-        if not username or not email or not password1 or not password1:
+        if not username or not email or not password1 or not password2:
             session['alert'] = 'ユーザー名とe-mailとパスワードとパスワード（確認）は必須入力です'
             return render_template('sign_up.html') 
         elif password1 != password2:
