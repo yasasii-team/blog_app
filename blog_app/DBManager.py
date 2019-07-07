@@ -59,6 +59,15 @@ class DBManager():
             self.db.rollback()
             result = False
         return result
+        
+    def get_user_by_id(self, id: int):
+        sql = "select * from users where id=?;"
+        self.cursor.execute(sql, (id,))
+        users = self.cursor.fetchall()
+        if users:
+            return users[0]
+        else:
+            return None
 
     def find_user(self, email: str, password: str):
         sql = "select * from users where email=? and password=?;"

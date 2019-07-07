@@ -2,6 +2,7 @@
 from blog_app import app
 from flask import render_template, jsonify, abort, request, url_for, redirect, session
 from blog_app.DBManager import DBManager 
+import re
 
 @app.route('/')
 def index():
@@ -119,6 +120,70 @@ def delete():
         db_manager.close()
         return abort(403)
 
+def password_validation(password):
+    #数字小文字大文字を含む8-255文字
+    pattern = r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,255}$"
+    if re.match(pattern, password):
+        return True
+    else:
+        return False
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    #ログイン機能に合わせて要書き換え
+    user_id = 1
+
+    #ログインしているユーザーの情報を取得
+    blog_db = DBManager()
+    login_user = blog_db.get_user_by_id(user_id)
+    if not login_user:
+        session['alert'] = '不正なアクセスです'
+        blog_db.close()
+        return redirect(url_for('index')) 
+
+    #POST:パスワード変更処理
+    if request.method == 'POST':
+        #email = request.form['email']
+        email = session['email']
+        oldpassword = request.form['oldpassword']
+        password1 = request.form['password1']
+        password2 = request.form['password2']
+
+        #session['email'] = email
+
+        if not oldpassword or not password1 or not password2:
+            session['alert'] = '旧パスワードと新パスワードと新パスワード（確認）は必須入力です'
+            blog_db.close()
+            return render_template('change_password.html')             
+        elif password1 != password2:
+            session['alert'] = 'パスワードとパスワード（確認）は同じ文字を入れてください'
+            blog_db.close()
+            return render_template('change_password.html')            
+        else:
+            if not password_validation(password1):
+                session['alert'] = 'パスワードの書式が誤っています'
+                blog_db.close()
+                return render_template('change_password.html')
+            # 旧パスワードの確認
+            if not blog_db.find_user(email, password1):
+                session['alert'] = '旧パスワードが一致しません'
+                blog_db.close()
+                return render_template('change_password.html')
+            result = blog_db.change_password(user_id, password1)
+            blog_db.close()
+            
+            if result:
+                return redirect(url_for('index'))           
+            else:
+                session['alert'] = 'パスワード更新に失敗しました'
+                return render_template('change_password.html') 
+
+     #ユーザー更新画面へ
+    else:
+        session.pop('alert', None)
+        session['email'] = login_user['email']
+        blog_db.close()
+        return render_template('change_password.html')           
 # @app.route('/')
 # def index():
 #     return "Hello World"
