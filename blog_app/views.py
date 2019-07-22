@@ -120,7 +120,7 @@ def delete():
         db_manager.close()
         return abort(403)
 
-def name_validation(name):
+def validation_name(name):
     #英数字3-50文字
     #ログインにメールアドレスのほうを使うなら文字数制限だけでよいかも
     pattern = r"^[A-Za-z0-9]{3,50}$"
@@ -129,14 +129,14 @@ def name_validation(name):
     else:
         return False
 
-def mail_validation(mail):
+def validation_mail(mail):
     pattern = r"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"
     if re.match(pattern, mail):
         return True
     else:
         return False
 
-def password_validation(password):
+def validation_password(password):
     #数字小文字大文字を含む8-255文字
     pattern = r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,255}$"
     if re.match(pattern, password):
@@ -165,13 +165,13 @@ def create_user():
             return render_template('sign_up.html')            
         else:
             #バリデーションチェック
-            if not name_validation(username):
+            if not validation_name(username):
                 session['alert'] = 'ユーザー名の書式が誤っています'
                 return render_template('sign_up.html')
-            if not mail_validation(email):
+            if not validation_mail(email):
                 session['alert'] = 'e-mailの書式が誤っています'
                 return render_template('sign_up.html')
-            if not password_validation(password1):
+            if not validation_password(password1):
                 session['alert'] = 'パスワードの書式が誤っています'
                 return render_template('sign_up.html')
 
@@ -226,11 +226,11 @@ def update_user():
             return render_template('update_user.html')           
         else:
             #バリデーションチェック
-            if not name_validation(username):
+            if not validation_name(username):
                 session['alert'] = 'ユーザー名の書式が誤っています'
                 blog_db.close()
                 return render_template('update_user.html')
-            if not mail_validation(email):
+            if not validation_mail(email):
                 session['alert'] = 'e-mailの書式が誤っています'
                 blog_db.close()
                 return render_template('update_user.html')
