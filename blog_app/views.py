@@ -175,7 +175,7 @@ def change_password():
             blog_db.close()
             return render_template('change_password.html')             
         elif password1 != password2:
-            session['alert'] = 'パスワードとパスワード（確認）は同じ文字を入れてください'
+            session['alert'] = '新パスワー新ドとパスワード（確認）は同じ文字を入れてください'
             blog_db.close()
             return render_template('change_password.html')            
         else:
@@ -184,7 +184,7 @@ def change_password():
                 blog_db.close()
                 return render_template('change_password.html')
             # 旧パスワードの確認
-            if not blog_db.find_user(email, password1):
+            if not blog_db.find_user(email, oldpassword):
                 session['alert'] = '旧パスワードが一致しません'
                 blog_db.close()
                 return render_template('change_password.html')
