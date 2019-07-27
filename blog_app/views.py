@@ -20,33 +20,30 @@ def post_detail(post_id):
 @app.route('/signin', methods=['GET','POST'])
 def signin():
 
-#よければ後で関数化する
-    if 'user_id' in session:
+    #よければ後で関数化する
+    if 'user' in session:
         return redirect(url_for('index'))
 
-#今だとuser1しか開かない
-    #user1のidとメールアドレスとパスワードをデータベースより取得
-    sql = "select id,email, password from users where name = 'user1';"
-    db = DBManager()
-    db.cursor.execute(sql)
-    signin_info = db.cursor.fetchone()
-    id = signin_info['id']
-    email = signin_info['email']
-    password = signin_info['password']
-    db.close()
-
-    session.pop('email_alert', None)
-    session.pop('password_alert', None)
-
     if request.method == 'POST':
-        if request.form['email'] != email:
-            session['email_alert'] = 'メールアドレスが間違っています'
-        elif request.form['password'] != password:
-            session['password_alert'] = 'パスワードが間違っています'
+
+        session.pop('signin_alert', None)
+
+        email = request.form['email']
+        password = request.form['password']
+
+        db = DBManager()
+        user = db.find_user(email,password)
+        db.close()
+
+        if user == None:
+            session['signin_alert'] = 'メールアドレスかパスワードが間違っています'
+            return render_template('signin.html',email = email)
         else:
-            session['user_id'] = id
+            session['user_id'] = user['id']
             return redirect(url_for('index'))
-    return render_template('signin.html')
+
+    else:
+        return render_template('signin.html')
 
 @app.route('/signout')
 def signout():
