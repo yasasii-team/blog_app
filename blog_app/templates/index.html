@@ -2,7 +2,7 @@
 {% block body %}
 <section class="section">
   <h1>ブログ一覧</h1>
-    {% if session.user_id %}
+    {% if session.user %}
     <ul>
       {% for post in posts %}
       <li id="deleted_post_{{ post.id }}">

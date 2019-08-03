@@ -4,7 +4,7 @@
 <section class="section">
 
     {% if session.signin_alert %}
-    <p>{{ session.signin_alert }}</p>
+    <p class="alert-color">{{ session.signin_alert }}</p>
     {% endif %}
 
     <form action="/signin" method="post">

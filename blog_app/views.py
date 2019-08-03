@@ -32,14 +32,14 @@ def signin():
         password = request.form['password']
 
         db = DBManager()
-        user = db.find_user(email,password)
+        user_db_obj = db.find_user(email,password)
         db.close()
 
-        if user == None:
+        if user_db_obj == None:
             session['signin_alert'] = 'メールアドレスかパスワードが間違っています'
             return render_template('signin.html',email = email)
         else:
-            session['user_id'] = user['id']
+            session['user'] = dict(user_db_obj)
             return redirect(url_for('index'))
 
     else:
@@ -47,7 +47,7 @@ def signin():
 
 @app.route('/signout')
 def signout():
-    session.pop('user_id', None)
+    session.pop('user', None)
     return redirect(url_for('index'))
 
 @app.route('/add', methods=['GET', 'POST'])
