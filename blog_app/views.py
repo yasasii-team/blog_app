@@ -166,19 +166,19 @@ def create_user():
         else:
             #バリデーションチェック
             if not validation_name(username):
-                session['alert'] = 'ユーザー名の書式が誤っています'
+                session['alert'] = 'ユーザー名の書式が誤っています。英数字3-50文字で入力してください。'
                 return render_template('sign_up.html')
             if not validation_mail(email):
                 session['alert'] = 'e-mailの書式が誤っています'
                 return render_template('sign_up.html')
             if not validation_password(password1):
-                session['alert'] = 'パスワードの書式が誤っています'
+                session['alert'] = 'パスワードの書式が誤っています。数字小文字大文字を含む8-255文字で入力してください。'
                 return render_template('sign_up.html')
 
             blog_db = DBManager()
 
             #メールアドレス重複チェック
-            if blog_db.get_user_by_mail(email):
+            if blog_db.find_user_by_mail(email):
                 session['alert'] = 'e-mailは既に存在しています'
                 blog_db.close()
                 return render_template('sign_up.html') 
@@ -207,7 +207,7 @@ def update_user():
 
     #ログインしているユーザーの情報を取得
     blog_db = DBManager()
-    login_user = blog_db.get_user_by_id(user_id)
+    login_user = blog_db.find_user_by_id(user_id)
     if not login_user:
         session['alert'] = '不正なアクセスです'
         blog_db.close()
@@ -227,7 +227,7 @@ def update_user():
         else:
             #バリデーションチェック
             if not validation_name(username):
-                session['alert'] = 'ユーザー名の書式が誤っています'
+                session['alert'] = 'ユーザー名の書式が誤っています。英数字3-50文字で入力してください。'
                 blog_db.close()
                 return render_template('update_user.html')
             if not validation_mail(email):
@@ -236,7 +236,7 @@ def update_user():
                 return render_template('update_user.html')
 
             #メールアドレス重複チェック(ログイン機能とユーザー登録機能がマージされてからテスト)
-            user_tmp = blog_db.get_user_by_mail(email)
+            user_tmp = blog_db.find_user_by_mail(email)
             if user_tmp:
                 if user_tmp['id'] != user_id:
                     session['alert'] = 'e-mailは既に存在しています'
