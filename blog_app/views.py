@@ -1,11 +1,7 @@
 # coding: utf-8
 from blog_app import app
 from flask import render_template, jsonify, abort, request, url_for, redirect, session
-<<<<<<< HEAD
 from blog_app.DBManager import DBManager 
-=======
-from blog_app.DBManager import DBManager
->>>>>>> develop
 import re
 
 @app.route('/')
@@ -155,7 +151,7 @@ def change_password():
 
     #ログインしているユーザーの情報を取得
     blog_db = DBManager()
-    login_user = blog_db.get_user_by_id(user_id)
+    login_user = blog_db.find_user_by_id(user_id)
     if not login_user:
         session['alert'] = '不正なアクセスです'
         blog_db.close()
@@ -180,7 +176,7 @@ def change_password():
             return render_template('change_password.html')            
         else:
             if not password_validation(password1):
-                session['alert'] = 'パスワードの書式が誤っています'
+                session['alert'] = 'パスワードの書式が誤っています。数字小文字大文字を含む8-255文字で入力してください。'
                 blog_db.close()
                 return render_template('change_password.html')
             # 旧パスワードの確認
@@ -236,7 +232,7 @@ def create_user():
 
             blog_db = DBManager()
             #メールアドレス重複チェック
-            if blog_db.get_user_by_mail(email):
+            if blog_db.find_user_by_mail(email):
                 session['alert'] = 'e-mailは既に存在しています'
                 blog_db.close()
                 return render_template('sign_up.html') 
@@ -246,7 +242,7 @@ def create_user():
             if result:
                 return redirect(url_for('index'))           
             else:
-               session['alert'] = 'ユーザー登録に失敗しました'
+                session['alert'] = 'ユーザー登録に失敗しました'
                 return render_template('sign_up.html') 
 
     #登録画面へ
