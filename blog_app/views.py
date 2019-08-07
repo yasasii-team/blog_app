@@ -161,31 +161,31 @@ def change_password():
     if request.method == 'POST':
         #email = request.form['email']
         email = session['email']
-        oldpassword = request.form['oldpassword']
-        password1 = request.form['password1']
-        password2 = request.form['password2']
+        old_password = request.form['old_password']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
         #session['email'] = email
 
-        if not oldpassword or not password1 or not password2:
+        if not old_password or not password or not confirm_password:
             session['alert'] = '旧パスワードと新パスワードと新パスワード（確認）は必須入力です'
             blog_db.close()
             return render_template('change_password.html')             
-        elif password1 != password2:
+        elif password != confirm_password:
             session['alert'] = '新パスワー新ドとパスワード（確認）は同じ文字を入れてください'
             blog_db.close()
             return render_template('change_password.html')            
         else:
-            if not password_validation(password1):
+            if not password_validation(password):
                 session['alert'] = 'パスワードの書式が誤っています。数字小文字大文字を含む8-255文字で入力してください。'
                 blog_db.close()
                 return render_template('change_password.html')
             # 旧パスワードの確認
-            if not blog_db.find_user(email, oldpassword):
+            if not blog_db.find_user(email, old_password):
                 session['alert'] = '旧パスワードが一致しません'
                 blog_db.close()
                 return render_template('change_password.html')
 
-            result = blog_db.change_password(user_id, password1)
+            result = blog_db.change_password(user_id, password)
             if result:
                 return redirect(url_for('index'))           
             else:
