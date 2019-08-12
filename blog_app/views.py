@@ -211,7 +211,7 @@ def create_user():
             blog_db = DBManager()
 
             #メールアドレス重複チェック
-            if blog_db.get_user_by_mail(email):
+            if blog_db.find_user_by_mail(email):
                 session['alert'] = 'e-mailは既に存在しています'
                 blog_db.close()
                 return render_template('sign_up.html') 

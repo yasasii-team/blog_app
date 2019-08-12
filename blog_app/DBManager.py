@@ -60,7 +60,7 @@ class DBManager():
             result = False
         return result
 
-    def get_user_by_mail(self, email: str):
+    def find_user_by_mail(self, email: str):
         sql = "select * from users where email=?;"
         self.cursor.execute(sql, (email,))
         users = self.cursor.fetchall()
@@ -68,7 +68,16 @@ class DBManager():
             return users[0]
         else:
             return None
-            
+
+    def find_user_by_id(self, id: int):
+        sql = "select * from users where id=?;"
+        self.cursor.execute(sql, (id,))
+        users = self.cursor.fetchall()
+        if users:
+            return users[0]
+        else:
+            return None
+
     def find_user(self, email: str, password: str):
         sql = "select * from users where email=? and password=?;"
         self.cursor.execute(sql, (email, password,))
