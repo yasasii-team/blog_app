@@ -18,6 +18,39 @@ def post_detail(post_id):
     db.close()
     return render_template('post_detail.html',post = post)
 
+@app.route('/signin', methods=['GET','POST'])
+def signin():
+
+    #よければ後で関数化する
+    if 'user' in session:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+
+        session.pop('signin_alert', None)
+
+        email = request.form['email']
+        password = request.form['password']
+
+        db = DBManager()
+        user_db_obj = db.find_user(email,password)
+        db.close()
+
+        if user_db_obj == None:
+            session['signin_alert'] = 'メールアドレスかパスワードが間違っています'
+            return render_template('signin.html',email = email)
+        else:
+            session['user'] = dict(user_db_obj)
+            return redirect(url_for('index'))
+
+    else:
+        return render_template('signin.html')
+
+@app.route('/signout')
+def signout():
+    session.pop('user', None)
+    return redirect(url_for('index'))
+
 @app.route('/add', methods=['GET', 'POST'])
 def create_page():
 

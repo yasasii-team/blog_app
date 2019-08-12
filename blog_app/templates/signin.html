@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<section class="section">
+
+    {% if session.signin_alert %}
+    <p class="alert-color">{{ session.signin_alert }}</p>
+    {% endif %}
+
+    <form action="/signin" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <p><label for="title">メールアドレス：</label></p>
+        <p><input type="text" name="email" value="{{email}}"></p>
+        <p><label for="password">パスワード：</label></p>
+        <p><input type="password" name="password"></p>
+        <p><button type="submit" value="送信">SignIn</button></p>
+    </form>
+
+</section>
+{% endblock %}
