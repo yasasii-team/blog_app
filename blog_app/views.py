@@ -153,7 +153,7 @@ def delete():
         db_manager.close()
         return abort(403)
 
-def name_validation(name):
+def validation_name(name):
     #英数字3-50文字
     #ログインにメールアドレスのほうを使うなら文字数制限だけでよいかも
     pattern = r"^[A-Za-z0-9]{3,50}$"
@@ -162,14 +162,14 @@ def name_validation(name):
     else:
         return False
 
-def mail_validation(mail):
+def validation_mail(mail):
     pattern = r"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"
     if re.match(pattern, mail):
         return True
     else:
         return False
 
-def password_validation(password):
+def validation_password(password):
     #数字小文字大文字を含む8-255文字
     pattern = r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,255}$"
     if re.match(pattern, password):
@@ -198,20 +198,20 @@ def create_user():
             return render_template('sign_up.html')            
         else:
             #バリデーションチェック
-            if not name_validation(username):
+            if not validation_name(username):
                 session['alert'] = 'ユーザー名の書式が誤っています'
                 return render_template('sign_up.html')
-            if not mail_validation(email):
+            if not validation_mail(email):
                 session['alert'] = 'e-mailの書式が誤っています'
                 return render_template('sign_up.html')
-            if not password_validation(password1):
+            if not validation_password(password1):
                 session['alert'] = 'パスワードの書式が誤っています'
                 return render_template('sign_up.html')
 
             blog_db = DBManager()
 
             #メールアドレス重複チェック
-            if blog_db.get_user_by_mail(email):
+            if blog_db.find_user_by_mail(email):
                 session['alert'] = 'e-mailは既に存在しています'
                 blog_db.close()
                 return render_template('sign_up.html') 
@@ -232,6 +232,121 @@ def create_user():
         session.pop('password1', None)
         session.pop('password2', None)
         return render_template('sign_up.html')
+
+@app.route('/update_user', methods=['GET', 'POST'])
+def update_user():
+    #ログイン機能に合わせて要書き換え
+    user_id = 1
+
+    #ログインしているユーザーの情報を取得
+    blog_db = DBManager()
+    login_user = blog_db.find_user_by_id(user_id)
+    if not login_user:
+        session['alert'] = '不正なアクセスです'
+        blog_db.close()
+        return redirect(url_for('index')) 
+   
+    #POST:ユーザー更新処理
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        session['username'] = username
+        session['email'] = email
+
+        if not username or not email:
+            session['alert'] = 'ユーザー名とe-mailは必須入力です'
+            blog_db.close()
+            return render_template('update_user.html')           
+        else:
+            #バリデーションチェック
+            if not validation_name(username):
+                session['alert'] = 'ユーザー名の書式が誤っています。英数字3-50文字で入力してください。'
+                blog_db.close()
+                return render_template('update_user.html')
+            if not validation_mail(email):
+                session['alert'] = 'e-mailの書式が誤っています'
+                blog_db.close()
+                return render_template('update_user.html')
+
+            #メールアドレス重複チェック(ログイン機能とユーザー登録機能がマージされてからテスト)
+            user_tmp = blog_db.find_user_by_mail(email)
+            if user_tmp:
+                if user_tmp['id'] != user_id:
+                    session['alert'] = 'e-mailは既に存在しています'
+                    blog_db.close()
+                    return render_template('update_user.html')
+
+            result = blog_db.update_user(user_id, username, email)
+            blog_db.close()
+            
+            if result:
+                return redirect(url_for('index'))           
+            else:
+                session['alert'] = 'ユーザー更新に失敗しました'
+                return render_template('update_user.html') 
+
+    #ユーザー更新画面へ
+    else:
+        session.pop('alert', None)
+        session['username'] = login_user['name']
+        session['email'] = login_user['email']
+        blog_db.close()
+        return render_template('update_user.html')
+        
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    #ログイン機能に合わせて要書き換え
+    user_id = 1
+
+    #ログインしているユーザーの情報を取得
+    blog_db = DBManager()
+    login_user = blog_db.find_user_by_id(user_id)
+    if not login_user:
+        session['alert'] = '不正なアクセスです'
+        blog_db.close()
+        return redirect(url_for('index')) 
+
+    #POST:パスワード変更処理
+    if request.method == 'POST':
+        #email = request.form['email']
+        email = session['email']
+        old_password = request.form['old_password']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        #session['email'] = email
+
+        if not old_password or not password or not confirm_password:
+            session['alert'] = '旧パスワードと新パスワードと新パスワード（確認）は必須入力です'
+            blog_db.close()
+            return render_template('change_password.html')             
+        elif password != confirm_password:
+            session['alert'] = '新パスワー新ドとパスワード（確認）は同じ文字を入れてください'
+            blog_db.close()
+            return render_template('change_password.html')            
+        else:
+            if not validation_password(password):
+                session['alert'] = 'パスワードの書式が誤っています。数字小文字大文字を含む8-255文字で入力してください。'
+                blog_db.close()
+                return render_template('change_password.html')
+            # 旧パスワードの確認
+            if not blog_db.find_user(email, old_password):
+                session['alert'] = '旧パスワードが一致しません'
+                blog_db.close()
+                return render_template('change_password.html')
+
+            result = blog_db.change_password(user_id, password)
+            if result:
+                return redirect(url_for('index'))           
+            else:
+                session['alert'] = 'パスワード更新に失敗しました'
+                return render_template('change_password.html') 
+
+    #パスワード変更画面へ
+    else:
+        session.pop('alert', None)
+        session['email'] = login_user['email']
+        blog_db.close()
+        return render_template('change_password.html')
 
 # @app.route('/')
 # def index():
