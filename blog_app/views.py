@@ -103,9 +103,22 @@ def check_and_get_post(id,blog_db):
         return redirect(url_for('index'))
     return post
 
+def check_right_user(post_id):
+    db = DBManager()
+    post = db.get_post(post_id)
+    db.close()
+    session_user = session['user']
+    current_user_id = session_user['id']
+    if current_user_id != post['user_id']:
+        return redirect(url_for('index'))
+
 @app.route('/update/<int:post_id>', methods=['GET', 'POST'])
 def update_page(post_id):
     #POST:更新処理
+    
+    #ここでポストの持つuser_idとsessionの持つuser_idがイコールか関数でチェックしたいが機能していない
+    check_right_user(post_id)
+
     if request.method == 'POST':
         post_id = request.form['post_id']
         title = request.form['title']
