@@ -103,21 +103,24 @@ def check_and_get_post(id,blog_db):
         return redirect(url_for('index'))
     return post
 
-def check_right_user(post_id):
+def check_right_user(user_id):
     db = DBManager()
-    post = db.get_post(post_id)
+    post_id = db.find_user_by_id(user_id)
     db.close()
+    if session.get('user') == None:
+        return False
     session_user = session['user']
     current_user_id = session_user['id']
-    if current_user_id != post['user_id']:
-        return redirect(url_for('index'))
+    if current_user_id != post_id:
+        return False
+    return True
 
 @app.route('/update/<int:post_id>', methods=['GET', 'POST'])
 def update_page(post_id):
     #POST:更新処理
     
-    #ここでポストの持つuser_idとsessionの持つuser_idがイコールか関数でチェックしたいが機能していない
-    check_right_user(post_id)
+    if check_right_user(post_id) == False:
+        return redirect(url_for('index'))
 
     if request.method == 'POST':
         post_id = request.form['post_id']
@@ -156,6 +159,7 @@ def update_page(post_id):
 
 @app.route('/delete', methods=['POST'])
 def delete():
+
     id = request.json['id']
     db_manager = DBManager()
     if db_manager.delete_post(id):
