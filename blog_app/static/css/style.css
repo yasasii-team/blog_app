@@ -42,11 +42,6 @@ body {
   color: red;
 }
 
-a {
-  text-decoration: none;
-  color: #000;
-}
-
 .section {
   /* margin-left: 80px; */
   margin: 50px 80px;
