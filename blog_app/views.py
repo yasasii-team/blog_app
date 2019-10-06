@@ -54,8 +54,8 @@ def signout():
 @app.route('/add', methods=['GET', 'POST'])
 def create_page():
 
-    #ログイン時にセッションに入れておく
-    user_id = 1
+    user = session.get('user')
+    user_id = user['id']
 
     #POST:登録処理
     if request.method == 'POST':
@@ -105,8 +105,11 @@ def check_and_get_post(id,blog_db):
 
 def check_right_user(user_id):
     db = DBManager()
-    post_id = db.find_user_by_id(user_id)
+    post_detail = db.get_post(user_id)
     db.close()
+    dict_post = dict(post_detail)
+    print(dict_post)
+    post_id = dict_post['user_id']
     if session.get('user') == None:
         return False
     session_user = session['user']
