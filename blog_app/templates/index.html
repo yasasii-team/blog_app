@@ -2,24 +2,18 @@
 {% block body %}
 <section class="section">
   <h1>ブログ一覧</h1>
-    {% if session.user %}
     <ul>
       {% for post in posts %}
       <li id="deleted_post_{{ post.id }}">
         <a href="/post_detail/{{ post.id }}">{{ post.title }}</a>
-        <a href='/update/{{ post.id }}'>[修正]</a>
-        <a href="#" id="{{ post.id }}" class="delete_button">[X]</a>
+        {% if session.user %}
+          {% if session.user.id == post.user_id %}
+            <a href='/update/{{ post.id }}'>[修正]</a>
+            <a href="#" id="{{ post.id }}" class="delete_button">[X]</a>
+          {% endif %}
+        {% endif %}
       </li>
       {% endfor %}
     </ul>
-    {% else %}
-    <ul>
-      {% for post in posts %}
-      <li id="deleted_post_{{ post.id }}">
-        <a href="/post_detail/{{ post.id }}">{{ post.title }}</a>
-      </li>
-      {% endfor %}
-    </ul>
-    {% endif %}
 </section>
 {% endblock %}
