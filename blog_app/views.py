@@ -55,7 +55,10 @@ def signout():
 def create_page():
 
     user = session.get('user')
-    user_id = user['id']
+    if user == None:
+        return redirect(url_for('index'))
+    else:
+        user_id = user['id']
 
     #POST:登録処理
     if request.method == 'POST':
@@ -163,6 +166,10 @@ def update_page(post_id):
 def delete():
 
     id = request.json['id']
+
+    if check_right_user(id) == False:
+        return abort(403)
+
     db_manager = DBManager()
     if db_manager.delete_post(id):
         db_manager.close()
