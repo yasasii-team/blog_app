@@ -54,8 +54,11 @@ def signout():
 @app.route('/add', methods=['GET', 'POST'])
 def create_page():
 
-    #ログイン時にセッションに入れておく
-    user_id = 1
+    user = session.get('user')
+    if user == None:
+        return redirect(url_for('index'))
+    else:
+        user_id = user['id']
 
     #POST:登録処理
     if request.method == 'POST':
@@ -103,9 +106,27 @@ def check_and_get_post(id,blog_db):
         return redirect(url_for('index'))
     return post
 
+def check_right_user(post_id):
+    db = DBManager()
+    post_detail = db.get_post(post_id)
+    db.close()
+    dict_post = dict(post_detail)
+    user_id = dict_post['user_id']
+    if session.get('user') == None:
+        return False
+    session_user = session['user']
+    current_user_id = session_user['id']
+    if current_user_id != user_id:
+        return False
+    return True
+
 @app.route('/update/<int:post_id>', methods=['GET', 'POST'])
 def update_page(post_id):
     #POST:更新処理
+    
+    if check_right_user(post_id) == False:
+        return redirect(url_for('index'))
+
     if request.method == 'POST':
         post_id = request.form['post_id']
         title = request.form['title']
@@ -143,7 +164,12 @@ def update_page(post_id):
 
 @app.route('/delete', methods=['POST'])
 def delete():
+
     id = request.json['id']
+
+    if check_right_user(id) == False:
+        return abort(403)
+
     db_manager = DBManager()
     if db_manager.delete_post(id):
         db_manager.close()
@@ -347,7 +373,3 @@ def change_password():
         session['email'] = login_user['email']
         blog_db.close()
         return render_template('change_password.html')
-
-# @app.route('/')
-# def index():
-#     return "Hello World"
