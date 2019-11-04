@@ -5,7 +5,7 @@ body {
 
 .header-container {
   background-color: #a4c1f4;
-  padding: 23px;
+  padding: 18px;
 }
 
 .header-logo-nav-wrap {
@@ -32,10 +32,12 @@ body {
 }
 
 .header-nav > ul > li {
-  width: 90px;
+  width: 100px;
+  padding: 10px;
   text-align: center;
   display: inline-block;
   font-size: 18px;
+  word-break: break-all;
 }
 
 .alert-color {
